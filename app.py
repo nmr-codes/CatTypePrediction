@@ -1,5 +1,5 @@
 """
-MushukLens — cat breed classifier web app.
+KittenLens — cat breed classifier web app.
 
 Run:   python app.py
 Open:  http://127.0.0.1:5000
@@ -96,6 +96,13 @@ def predict_with_cam(img):
     return probs, cam
 
 
+def attention_grid(cam, n=8):
+    """Downsample the Grad-CAM map to n x n cells; values sum to 1 (share of attention)."""
+    g = F.adaptive_avg_pool2d(torch.from_numpy(cam)[None, None], n)[0, 0].numpy()
+    g = g / (g.sum() + 1e-8)
+    return np.round(g, 4).tolist()
+
+
 def heatmap_overlay(img, cam):
     """Return a data-URL PNG of the cropped 224x224 view with the heatmap on top."""
     base = ImageOps.fit(img, (224, 224), Image.BICUBIC)  # same area the model saw (approx.)
@@ -135,9 +142,12 @@ def predict():
     with lock:
         probs, cam = predict_with_cam(img)
 
-    top = np.argsort(-probs)[:3]
+    order = np.argsort(-probs)
+    ranked = [{"breed": class_names[i], "probability": float(probs[i])} for i in order]
     return jsonify(
-        predictions=[{"breed": class_names[i], "probability": float(probs[i])} for i in top],
+        predictions=ranked[:3],
+        probabilities=ranked,
+        attention=attention_grid(cam),
         heatmap=heatmap_overlay(img, cam),
     )
 

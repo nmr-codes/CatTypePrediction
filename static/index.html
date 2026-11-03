@@ -3,160 +3,252 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MushukLens — What kind of cat is that?</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+<meta name="color-scheme" content="light">
+<title>KittenLens – Cat breed registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DM+Mono:wght@400;500&family=Familjen+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0b14; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
-    --text:#f2f3fa; --mute:#9aa0b8; --a:#8b5cf6; --b:#22d3ee; --c:#f472b6; --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+    --paper:#f1e9d8; --card:#fbf6ea; --ink:#14110f; --red:#e8452c; --gold:#f2b632; --mute:#5d564b;
+    --display:"Dela Gothic One","Arial Black",Impact,sans-serif;
+    --body:"Familjen Grotesk","Segoe UI",system-ui,sans-serif;
+    --mono:"DM Mono",ui-monospace,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0}
-  html,body{min-height:100%}
   body{
-    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--text); overflow-x:hidden; line-height:1.5;
+    font-family:var(--body);font-size:17px;color:var(--ink);line-height:1.5;
+    background-color:var(--paper);
+    background-image:radial-gradient(rgba(20,17,15,.13) 1.1px,transparent 1.4px);
+    background-size:15px 15px;
   }
-  /* animated background */
-  .bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
-  .blob{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(90px);opacity:.38;animation:float 22s ease-in-out infinite}
-  .b1{background:var(--a);top:-18vmax;left:-12vmax}
-  .b2{background:var(--b);bottom:-22vmax;right:-10vmax;animation-delay:-8s}
-  .b3{background:var(--c);top:35%;left:48%;width:30vmax;height:30vmax;opacity:.22;animation-delay:-14s}
-  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6vmax,4vmax) scale(1.1)}66%{transform:translate(-4vmax,7vmax) scale(.95)}}
-  .grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:56px 56px;opacity:.18;mask-image:radial-gradient(circle at 50% 30%,#000 10%,transparent 70%);-webkit-mask-image:radial-gradient(circle at 50% 30%,#000 10%,transparent 70%)}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 22px 60px}
 
-  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:34px}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
-  .logo .ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,var(--a),var(--c));box-shadow:0 6px 24px rgba(139,92,246,.45)}
-  .pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);backdrop-filter:blur(10px)}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px currentColor;color:var(--warn)}
-  .dot.ok{background:var(--ok);color:var(--ok)} .dot.bad{background:var(--bad);color:var(--bad)}
+  header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .logo{font-family:var(--display);font-size:24px;letter-spacing:.01em}
+  .logo i{font-style:normal;background:var(--ink);color:var(--paper);padding:0 7px;margin-left:2px}
+  .status{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px;border:2px solid var(--ink);background:var(--card);padding:5px 11px}
+  .dot{width:10px;height:10px;border:2px solid var(--ink);background:var(--gold)}
+  .dot.ok{background:#3aa55d} .dot.bad{background:var(--red)}
 
-  .hero{text-align:center;margin-bottom:30px}
-  h1{font-size:clamp(34px,6vw,60px);line-height:1.05;font-weight:900;letter-spacing:-1.5px}
-  h1 span{background:linear-gradient(90deg,var(--b),var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 6s linear infinite}
-  @keyframes shine{to{background-position:200% center}}
-  .hero p{color:var(--mute);max-width:560px;margin:14px auto 0;font-size:17px}
+  .hero{position:relative;padding:54px 0 36px}
+  h1{font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:1.02;font-size:clamp(38px,7.2vw,82px);letter-spacing:-.01em;max-width:11.5em}
+  h1 mark{background:linear-gradient(transparent 24%,var(--gold) 24%);color:var(--ink);padding:0 .12em;margin:0 -.06em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .hero p{max-width:520px;margin-top:20px;color:var(--mute)}
+  .sticker{position:absolute;right:0;top:-6px;width:112px;height:112px;border-radius:50%;background:var(--red);color:var(--card);border:3px solid var(--ink);display:grid;place-items:center;text-align:center;transform:rotate(11deg);font-family:var(--display);font-size:34px;line-height:.9;box-shadow:5px 5px 0 var(--ink)}
+  .sticker small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+  @media(max-width:700px){.sticker{display:none}}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 30px 80px rgba(0,0,0,.45)}
-  .stage{display:grid;grid-template-columns:1fr;gap:22px}
-  .stage.has-result{grid-template-columns:1fr 1fr}
-  @media(max-width:760px){.stage.has-result{grid-template-columns:1fr}}
+  .banner{display:none;margin-bottom:22px;padding:14px 16px;border:3px solid var(--ink);background:var(--gold);font-size:15px;box-shadow:5px 5px 0 var(--ink)}
+  .banner code{font-family:var(--mono);font-size:13px;background:var(--card);padding:1px 6px;border:1.5px solid var(--ink)}
 
-  .drop{position:relative;border:2px dashed rgba(255,255,255,.22);border-radius:20px;min-height:320px;display:grid;place-items:center;text-align:center;padding:26px;cursor:pointer;transition:.25s;overflow:hidden;background:rgba(255,255,255,.02)}
-  .drop:hover,.drop.over{border-color:var(--b);background:rgba(34,211,238,.07);transform:translateY(-2px)}
-  .drop:focus-visible{outline:3px solid var(--a);outline-offset:3px}
-  .drop .big{font-size:58px;display:block;margin-bottom:8px;animation:bob 3s ease-in-out infinite}
-  @keyframes bob{50%{transform:translateY(-8px) rotate(-4deg)}}
-  .drop b{font-size:19px} .drop small{display:block;color:var(--mute);margin-top:6px}
-  .drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px}
-  .drop.filled{border-style:solid;border-color:var(--line);cursor:default;padding:0}
-  .drop.filled:hover{transform:none;background:none}
-  .scan{position:absolute;left:0;right:0;height:90px;top:-90px;background:linear-gradient(180deg,transparent,rgba(34,211,238,.55),transparent);border-bottom:2px solid var(--b);display:none}
-  .drop.loading .scan{display:block;animation:scan 1.4s ease-in-out infinite}
-  .drop.loading::after{content:"Analysing whiskers…";position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(10,11,20,.8);padding:6px 14px;border-radius:999px;font-size:13px;border:1px solid var(--line)}
-  @keyframes scan{to{top:100%}}
-  .tag{position:absolute;top:12px;left:12px;background:rgba(10,11,20,.75);border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12px;display:none;backdrop-filter:blur(6px)}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr);gap:34px;align-items:start}
+  .stage.has-result{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  @media(max-width:780px){.stage.has-result{grid-template-columns:minmax(0,1fr)}}
+
+  .drop{position:relative;min-height:340px;display:grid;place-items:center;text-align:center;padding:28px;cursor:pointer;overflow:hidden;background:var(--card);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+  .drop:hover,.drop.over{transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--red)}
+  .drop:focus-visible{outline:3px solid var(--red);outline-offset:4px}
+  .drop .plus{font-family:var(--display);font-size:64px;line-height:1;display:block;margin-bottom:10px}
+  .drop b{font-family:var(--display);font-weight:400;font-size:24px;text-transform:uppercase;display:block;line-height:1.1}
+  .drop small{display:block;font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:12px;line-height:1.7}
+  .drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .drop.filled{cursor:default;padding:0}
+  .drop.filled:hover{transform:none;box-shadow:8px 8px 0 var(--ink)}
+  .drop.loading::after{content:"Reading photo...";position:absolute;left:0;right:0;bottom:0;padding:9px;text-align:center;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;background:var(--gold);border-top:3px solid var(--ink)}
+  .tag{position:absolute;top:0;left:0;background:var(--ink);color:var(--paper);padding:5px 11px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;display:none}
   .drop.showcam .tag{display:block}
 
-  .result{display:none;flex-direction:column;gap:16px}
+  .result{display:none;position:relative;background:var(--card);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:0 24px 24px;flex-direction:column;gap:20px}
   .stage.has-result .result{display:flex}
-  .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
-  .top{display:flex;align-items:center;gap:18px}
-  .ring{position:relative;width:104px;height:104px;flex:none}
-  .ring svg{transform:rotate(-90deg)}
-  .ring .val{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:22px}
-  .name{font-size:clamp(26px,4vw,36px);font-weight:900;letter-spacing:-.5px;line-height:1.1}
-  .blurb{color:var(--mute);font-size:15px;margin-top:6px}
-  .notice{display:none;padding:10px 14px;border-radius:14px;font-size:14px;border:1px solid}
-  .notice.low{display:block;color:var(--warn);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
-  .bars{display:flex;flex-direction:column;gap:11px}
-  .row{display:grid;grid-template-columns:130px 1fr 52px;align-items:center;gap:10px;font-size:14px}
-  .track{height:10px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
-  .fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--b),var(--a));transition:width 1s cubic-bezier(.2,.8,.2,1)}
-  .row.first .fill{background:linear-gradient(90deg,var(--c),var(--a))}
-  .row span:last-child{text-align:right;color:var(--mute);font-variant-numeric:tabular-nums}
-  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
-  button{font:inherit;cursor:pointer;border-radius:14px;padding:11px 18px;border:1px solid var(--line);color:var(--text);background:var(--card);transition:.2s}
-  button:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
-  button.primary{border:none;background:linear-gradient(135deg,var(--a),var(--c));font-weight:700;box-shadow:0 8px 26px rgba(139,92,246,.4)}
-  button.on{border-color:var(--b);color:var(--b)}
-  .err{display:none;margin-top:16px;padding:12px 16px;border-radius:14px;color:var(--bad);border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.08);font-size:14px}
-  .banner{display:none;margin-bottom:18px;padding:16px 18px;border-radius:18px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);color:#fde9a8;font-size:14px}
-  .banner code{background:rgba(0,0,0,.35);padding:2px 7px;border-radius:7px;font-size:13px}
+  .file-bar{margin:0 -24px;padding:7px 24px;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+  .eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mute)}
+  .name{font-family:var(--display);font-size:clamp(30px,4.6vw,46px);line-height:1;text-transform:uppercase;margin-top:6px;padding-right:96px;overflow-wrap:anywhere}
+  .blurb{color:var(--mute);margin-top:10px;font-size:16px;max-width:30em}
+  .stamp{position:absolute;right:18px;top:48px;width:92px;height:92px;border:3px solid var(--red);color:var(--red);border-radius:50%;display:grid;place-items:center;text-align:center;transform:rotate(-12deg);font-family:var(--display);font-size:25px;line-height:1;background:var(--card);outline:2px solid var(--red);outline-offset:3px}
+  .stamp small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;margin-top:3px}
+  .notice{display:none;padding:10px 13px;border:2px dashed var(--ink);background:var(--gold);font-size:15px}
+  .notice.low{display:block}
+  .bars{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+  .row{display:grid;grid-template-columns:128px 1fr 54px;align-items:center;gap:12px;font-size:15px}
+  .row span:first-child{font-weight:700}
+  .track{position:relative;height:18px;border:2px solid var(--ink);background:var(--paper)}
+  .track::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 3px),var(--card) calc(10% - 3px) 10%)}
+  .fill{height:100%;width:0;background:var(--ink);transition:width .6s steps(12)}
+  .row.first .fill{background:var(--red)}
+  .row span:last-child{text-align:right;font-family:var(--mono);font-size:13px}
+  .actions{display:flex;flex-wrap:wrap;gap:12px}
+  button{font:inherit;font-weight:700;font-size:15px;cursor:pointer;padding:10px 18px;border:3px solid var(--ink);background:var(--card);color:var(--ink);box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+  button:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+  button:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+  button:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+  button.primary{background:var(--red);color:var(--card)}
+  button.on{background:var(--gold)}
+  .err{display:none;margin-top:24px;padding:12px 16px;border:3px solid var(--ink);background:var(--red);color:var(--card);font-weight:700;box-shadow:5px 5px 0 var(--ink)}
 
-  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:30px}
-  .chip{font-size:13px;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--card)}
-  .chip.hit{color:#fff;border-color:var(--c);background:rgba(244,114,182,.18)}
-  footer{margin-top:28px;text-align:center;color:var(--mute);font-size:13px;max-width:640px;margin-inline:auto}
-  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  .evidence{display:none;margin-top:64px}
+  .evidence.show{display:block}
+  .evidence > h2,.breeds h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,38px);text-transform:uppercase;line-height:1}
+  .evidence > .lede{color:var(--mute);margin:8px 0 26px;max-width:560px}
+  .panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:34px;align-items:start}
+  .panel{background:var(--card);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:0 20px 20px;min-width:0}
+  .panel.wide{grid-column:1 / -1}
+  .panel .file-bar{margin:0 -20px 14px;padding:6px 20px}
+  .panel h3{font-family:var(--display);font-weight:400;font-size:20px;text-transform:uppercase;line-height:1.1}
+  .panel .sub{font-size:14px;color:var(--mute);margin:5px 0 12px;max-width:46em}
+  .scroll{overflow-x:auto}
+  .chart{display:block;width:100%;height:auto}
+  .chart text{font-family:var(--mono);font-size:11px;fill:var(--ink)}
+  .chart .soft{fill:var(--mute)}
+  .chart .big{font-size:13px;font-weight:500}
+  .chart .grid{stroke:var(--ink);stroke-opacity:.18;stroke-width:1;stroke-dasharray:2 4}
+  .chart [data-tip]{cursor:default}
+  .chart rect[data-tip]:hover{stroke:var(--red);stroke-width:3}
+  .legend-row{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:12px;margin-top:8px}
+  .legend-row span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border:2px solid var(--ink);display:inline-block}
+  .sw.hot{background:var(--red)}
+  .ranks{list-style:none;padding:0;margin:6px 0 0;font-size:15px;display:grid;gap:3px}
+  .ranks li{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:baseline}
+  .ranks b{font-family:var(--mono);font-weight:500;font-size:13px}
+  .ranks i{font-style:normal;font-family:var(--mono);font-size:13px}
+  .lead{font-family:var(--display);font-size:34px;line-height:1;margin-top:14px}
+  .lead small{font-family:var(--body);font-size:14px;color:var(--mute);display:block;margin-top:6px}
+  .meter{display:flex;gap:4px;margin-top:10px}
+  .meter i{flex:1;height:18px;border:2px solid var(--ink);background:var(--paper)}
+  .meter i.on{background:var(--ink)}
+  .meter-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--mute);margin-top:4px}
+  .split{display:grid;gap:22px;margin-top:6px}
+  details{margin-top:14px;font-size:14px}
+  summary{cursor:pointer;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  table{border-collapse:collapse;margin-top:8px;font-size:14px;width:100%;max-width:420px}
+  th,td{border-bottom:1.5px solid var(--ink);padding:4px 8px;text-align:left}
+  td:last-child,th:last-child{text-align:right;font-family:var(--mono)}
+  .tally{display:grid;gap:10px;max-width:560px}
+  .tally-row{display:grid;grid-template-columns:150px 1fr 34px;align-items:center;gap:12px}
+  .tally-row span:first-child{font-weight:700}
+  .tally-row span:last-child{font-family:var(--mono);text-align:right}
+  .tally svg{display:block;height:30px;width:auto;max-width:100%}
+  .tally-empty{color:var(--mute);font-size:15px}
+  .tip{position:fixed;z-index:20;display:none;pointer-events:none;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12px;padding:5px 9px;max-width:240px}
+  @media(max-width:780px){.panels{grid-template-columns:minmax(0,1fr)}.tally-row{grid-template-columns:110px 1fr 28px}}
+  .breeds{margin-top:64px}
+  .breeds h2{font-family:var(--display);font-weight:400;font-size:22px;text-transform:uppercase}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-family:var(--mono);font-size:12px;border:2px solid var(--ink);background:var(--card);padding:3px 10px;text-transform:uppercase;letter-spacing:.04em}
+  .chip.hit{background:var(--red);color:var(--card);transform:rotate(-2deg) scale(1.06);box-shadow:3px 3px 0 var(--ink)}
+  footer{margin-top:26px;font-size:14px;color:var(--mute);max-width:640px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid"></div></div>
-
 <div class="wrap">
   <header>
-    <div class="logo"><div class="ico">🐱</div>MushukLens</div>
-    <div class="pill"><span class="dot" id="dot"></span><span id="statusText">Checking model…</span></div>
+    <div class="logo">Kitten<i>Lens</i></div>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">Checking model…</span></div>
   </header>
 
   <div class="hero">
-    <h1>What <span>kind of cat</span><br>is that?</h1>
-    <p>Drop a photo and a fine-tuned EfficientNet tells you the breed, and shows you where it was looking.</p>
+    <h1>What kind of <mark>cat</mark> is that?</h1>
+    <p>Hand over a photo and a fine-tuned EfficientNet files it under one of twelve breeds, then shows which part of the picture it was staring at.</p>
+    <div class="sticker"><div>12<small>breeds</small></div></div>
   </div>
 
   <div class="banner" id="banner"></div>
 
-  <main class="card">
+  <main>
     <div class="stage" id="stage">
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a cat photo">
         <div id="prompt">
-          <span class="big">📸</span>
-          <b>Drop a cat photo here</b>
-          <small>or click to browse · paste with Ctrl+V · JPG / PNG / WebP · max 8 MB</small>
+          <span class="plus">+</span>
+          <b>Drop a cat photo</b>
+          <small>or click to browse / paste with ctrl+v<br>jpg · png · webp · max 8 mb</small>
         </div>
         <img id="preview" alt="" hidden>
-        <div class="scan"></div>
-        <div class="tag">🔥 AI attention map</div>
+        <div class="tag">Attention map</div>
         <input type="file" id="file" accept="image/*" hidden>
       </div>
 
       <div class="result" id="result">
-        <div class="eyebrow">Best guess</div>
-        <div class="top">
-          <div class="ring">
-            <svg width="104" height="104" viewBox="0 0 104 104">
-              <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>
-              <circle id="arc" cx="52" cy="52" r="44" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46" style="transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)"/>
-              <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#f472b6"/></linearGradient></defs>
-            </svg>
-            <div class="val" id="pct">0%</div>
-          </div>
-          <div>
-            <div class="name" id="breed">—</div>
-            <div class="blurb" id="blurb"></div>
-          </div>
+        <div class="file-bar">Case file · breed identification</div>
+        <div class="stamp" aria-label="Confidence"><div><span id="pct">0%</span><small>sure</small></div></div>
+        <div>
+          <div class="eyebrow">Verdict</div>
+          <div class="name" id="breed">–</div>
+          <div class="blurb" id="blurb"></div>
         </div>
         <div class="notice" id="notice"></div>
-        <div class="eyebrow">Top 3</div>
-        <div class="bars" id="bars"></div>
+        <div>
+          <div class="eyebrow">Other suspects</div>
+          <div class="bars" id="bars"></div>
+        </div>
         <div class="actions">
-          <button class="primary" id="again">Try another photo</button>
-          <button id="camBtn">🔥 Show where the AI looked</button>
+          <button class="primary" id="again">Another photo</button>
+          <button id="camBtn">Show attention map</button>
         </div>
       </div>
     </div>
     <div class="err" id="err"></div>
   </main>
 
-  <div class="chips" id="chips"></div>
-  <footer>
-    The model only knows these 12 breeds, so it will pick one of them even for a dog or a toy.
-    Confidence is the model's own estimate, not a guarantee. Photos are processed in memory and are not saved.
-  </footer>
+  <section class="evidence" id="evidence" aria-label="Evidence behind the verdict">
+    <h2>The evidence</h2>
+    <p class="lede">Everything the model weighed before it made up its mind: all twelve candidates, how close the race was, and where in the frame it looked.</p>
+    <div class="panels">
+
+      <div class="panel wide">
+        <div class="file-bar">Exhibit A</div>
+        <h3>The lineup</h3>
+        <p class="sub">All twelve breeds ranked by the probability the model gave them, like a height chart on a police wall.</p>
+        <div class="scroll"><svg class="chart" id="lineup" viewBox="0 0 720 312" role="img" aria-labelledby="lineupTitle" style="min-width:600px"><title id="lineupTitle">Probability of each of the twelve breeds, highest first</title></svg></div>
+        <details><summary>View as table</summary><table id="tbl"><thead><tr><th>Breed</th><th>Probability</th></tr></thead><tbody></tbody></table></details>
+      </div>
+
+      <div class="panel">
+        <div class="file-bar">Exhibit B</div>
+        <h3>How close was it?</h3>
+        <p class="sub">Top three on a 0–100% line. The thick bar is the winner’s lead over the runner-up.</p>
+        <svg class="chart" id="dumbbell" viewBox="0 0 420 96" role="img" aria-labelledby="dbTitle"><title id="dbTitle">Top three probabilities on a number line</title></svg>
+        <ol class="ranks" id="ranks"></ol>
+        <div class="lead" id="lead"></div>
+        <div class="split">
+          <div>
+            <div class="eyebrow">Breeds still in play</div>
+            <div class="meter" id="meter" aria-hidden="true"></div>
+            <div class="meter-scale"><span>1 = certain</span><span>12 = clueless</span></div>
+            <p class="sub" id="suspects" style="margin-top:8px"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="file-bar">Exhibit C</div>
+        <h3>Where it looked</h3>
+        <p class="sub">The attention map cut into an 8×8 grid. Darker cells drew more attention; the side bars add up each row and column.</p>
+        <svg class="chart" id="attn" viewBox="0 0 330 362" role="img" aria-labelledby="atTitle"><title id="atTitle">Grid showing which parts of the image the model paid attention to</title></svg>
+        <p class="sub" id="attnNote" style="margin-bottom:0"></p>
+      </div>
+
+      <div class="panel wide">
+        <div class="file-bar">Exhibit D</div>
+        <h3>This visit’s tally</h3>
+        <p class="sub">Every photo you have identified since opening the page, one stroke each.</p>
+        <div class="tally" id="tally"></div>
+      </div>
+
+    </div>
+  </section>
+  <div class="tip" id="tip" role="presentation"></div>
+
+
+  <section class="breeds">
+    <h2>The twelve it knows</h2>
+    <div class="chips" id="chips"></div>
+    <footer>
+      Anything else, like a dog, a fox or a plush toy, still gets filed under one of these twelve.
+      The percentage is the model’s own confidence, not a guarantee. Photos are processed in memory and never saved.
+    </footer>
+  </section>
 </div>
 
 <script>
@@ -185,7 +277,7 @@ async function loadStatus(){
     const s = await (await fetch("/api/status")).json();
     const dot=$("dot"), txt=$("statusText"), ban=$("banner");
     if(s.model_loaded){
-      dot.className="dot ok"; txt.textContent="Model ready · "+s.device.toUpperCase();
+      dot.className="dot ok"; txt.textContent="Model ready ("+s.device.toUpperCase()+")";
       const chips=$("chips"); chips.textContent="";
       s.classes.forEach(c=>{const d=document.createElement("div");d.className="chip";d.dataset.c=c;d.textContent=c;chips.appendChild(d);});
     }else{
@@ -202,20 +294,13 @@ async function loadStatus(){
   }catch{ $("dot").className="dot bad"; $("statusText").textContent="Server unreachable"; }
 }
 
-function countUp(el, to){
-  const t0=performance.now(), dur=1000;
-  (function f(t){ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
-    el.textContent=(to*e).toFixed(0)+"%"; if(k<1) requestAnimationFrame(f); })(t0);
-}
-
 function showResult(data){
   const [first,...rest]=data.predictions, p=first.probability*100;
   $("breed").textContent=first.breed;
   $("blurb").textContent=INFO[first.breed]||"";
-  countUp($("pct"), p);
-  requestAnimationFrame(()=>{ $("arc").style.strokeDashoffset=(276.46*(1-first.probability)).toFixed(2); });
+  $("pct").textContent=p.toFixed(0)+"%";
   const n=$("notice");
-  if(p<50){ n.className="notice low"; n.textContent="I’m not very sure about this one. Try a clearer, closer photo of the cat’s face and body, or the animal might not be one of these 12 breeds."; }
+  if(p<50){ n.className="notice low"; n.textContent="Not convinced. Try a clearer, closer photo, or this may not be one of the 12 breeds."; }
   else { n.className="notice"; n.textContent=""; }
   const bars=$("bars"); bars.textContent="";
   data.predictions.forEach((x,i)=>{
@@ -230,13 +315,146 @@ function showResult(data){
   document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("hit", c.dataset.c===first.breed));
   heatURL=data.heatmap; showingCam=false; updateCam();
   stage.classList.add("has-result");
+  try{ showCharts(data); }catch(e){ console.error("charts:", e); }
 }
 
 function updateCam(){
   preview.src = showingCam && heatURL ? heatURL : originalURL;
   drop.classList.toggle("showcam", showingCam);
   $("camBtn").classList.toggle("on", showingCam);
-  $("camBtn").textContent = showingCam ? "🖼️ Show my photo" : "🔥 Show where the AI looked";
+  $("camBtn").textContent = showingCam ? "Show my photo" : "Show attention map";
+}
+
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag, attrs, parent, text){
+  const n=document.createElementNS(NS, tag);
+  for(const k in attrs) n.setAttribute(k, attrs[k]);
+  if(text!==undefined) n.textContent=text;
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function clear(node){ [...node.children].forEach(c=>{ if(c.tagName.toLowerCase()!=="title") c.remove(); }); }
+const pct1 = v => (v*100).toFixed(v>=.995||v<.0005?0:1)+"%";
+
+/* shared tooltip for anything with data-tip */
+const tip=$("tip");
+document.addEventListener("pointermove", e=>{
+  const t=e.target.closest && e.target.closest("[data-tip]");
+  if(!t){ tip.style.display="none"; return; }
+  tip.textContent=t.dataset.tip; tip.style.display="block";
+  tip.style.left=Math.max(8, Math.min(e.clientX+14, innerWidth-tip.offsetWidth-8))+"px";
+  tip.style.top=(e.clientY+16)+"px";
+});
+document.addEventListener("pointerleave", ()=>{ tip.style.display="none"; });
+
+/* A. the lineup: 12 columns, tallest first */
+function drawLineup(list){
+  const svg=$("lineup"); clear(svg);
+  const L=46, R=8, T=26, B=92, W=720, H=312, ph=H-T-B, slot=(W-L-R)/list.length, bw=slot-12;
+  [0,.25,.5,.75,1].forEach(v=>{
+    const y=T+ph*(1-v);
+    svgEl("line",{x1:L,x2:W-R,y1:y,y2:y,class:"grid"},svg);
+    svgEl("text",{x:L-8,y:y+4,"text-anchor":"end",class:"soft"},svg,(v*100)+"%");
+  });
+  list.forEach((d,i)=>{
+    const x=L+i*slot+6, h=Math.max(2, d.probability*ph), y=T+ph-h;
+    svgEl("rect",{x,y,width:bw,height:h,fill:i===0?"var(--red)":"var(--ink)","data-tip":d.breed+": "+pct1(d.probability)},svg);
+    if(i<2) svgEl("text",{x:x+bw/2,y:y-7,"text-anchor":"middle",class:"big"},svg,pct1(d.probability));
+    const lx=x+bw/2+4, ly=T+ph+16;
+    svgEl("text",{x:lx,y:ly,"text-anchor":"end",transform:"rotate(-42 "+lx+" "+ly+")",style:"font-family:var(--body);font-size:13px;font-weight:"+(i===0?700:400)},svg,d.breed);
+  });
+  svgEl("line",{x1:L,x2:W-R,y1:T+ph,y2:T+ph,stroke:"var(--ink)","stroke-width":2},svg);
+  const tb=$("tbl").tBodies[0]; tb.textContent="";
+  list.forEach(d=>{ const r=tb.insertRow(); r.insertCell().textContent=d.breed; r.insertCell().textContent=pct1(d.probability); });
+}
+
+/* B. margin dumbbell + effective number of candidates */
+function drawMargin(list){
+  const svg=$("dumbbell"); clear(svg);
+  const X0=18, X1=402, y=40, sx=v=>X0+(X1-X0)*v, top=list.slice(0,3);
+  svgEl("line",{x1:X0,x2:X1,y1:y,y2:y,stroke:"var(--ink)","stroke-width":2},svg);
+  [0,.25,.5,.75,1].forEach(v=>{
+    svgEl("line",{x1:sx(v),x2:sx(v),y1:y-5,y2:y+5,stroke:"var(--ink)","stroke-width":2},svg);
+    svgEl("text",{x:sx(v),y:y+30,"text-anchor":v===0?"start":v===1?"end":"middle",class:"soft"},svg,(v*100)+"%");
+  });
+  const gap=top[0].probability-top[1].probability;
+  svgEl("line",{x1:sx(top[1].probability),x2:sx(top[0].probability),y1:y,y2:y,stroke:"var(--red)","stroke-width":8,"data-tip":"Lead over #2: "+(gap*100).toFixed(1)+" points"},svg);
+  top.slice().reverse().forEach(d=>{
+    const rank=top.indexOf(d)+1;
+    svgEl("circle",{cx:sx(d.probability),cy:y,r:11,fill:rank===1?"var(--red)":"var(--card)",stroke:"var(--ink)","stroke-width":2.5,"data-tip":d.breed+": "+pct1(d.probability)},svg);
+    svgEl("text",{x:sx(d.probability),y:y+4,"text-anchor":"middle",style:"font-weight:500;fill:"+(rank===1?"var(--card)":"var(--ink)")+";pointer-events:none"},svg,String(rank));
+  });
+  const ol=$("ranks"); ol.textContent="";
+  top.forEach((d,i)=>{
+    const li=document.createElement("li");
+    const a=document.createElement("b"); a.textContent="#"+(i+1);
+    const b=document.createElement("span"); b.textContent=d.breed;
+    const c=document.createElement("i"); c.textContent=pct1(d.probability);
+    li.append(a,b,c); ol.appendChild(li);
+  });
+  const lead=$("lead"); lead.textContent="";
+  lead.append("+"+(gap*100).toFixed(0)+" pts");
+  const sm=document.createElement("small");
+  sm.textContent= gap>.5 ? "Not even close." : gap>.2 ? "A clear winner." : gap>.07 ? "A narrow win." : "Almost a coin toss.";
+  lead.appendChild(sm);
+
+  const H=-list.reduce((s,d)=>s+(d.probability>0?d.probability*Math.log(d.probability):0),0);
+  const n=Math.exp(H), meter=$("meter"); meter.textContent="";
+  for(let i=1;i<=list.length;i++){ const s=document.createElement("i"); if(i<=Math.round(n)) s.className="on"; meter.appendChild(s); }
+  $("suspects").textContent="About "+n.toFixed(1)+" of "+list.length+" breeds are still in play. "+
+    (n<1.5?"The model has made up its mind.":n<3?"It was torn between a few.":"It was close to guessing.");
+}
+
+/* C. attention grid with marginal bars */
+function drawAttention(grid){
+  const svg=$("attn"); clear(svg);
+  const n=grid.length, c=34, ox=6, oy=56, gw=n*c;
+  const cols=Array(n).fill(0), rows=Array(n).fill(0);
+  let mx=0;
+  grid.forEach((row,r)=>row.forEach((v,k)=>{ rows[r]+=v; cols[k]+=v; if(v>mx) mx=v; }));
+  const mm=Math.max(...cols,...rows);
+  grid.forEach((row,r)=>row.forEach((v,k)=>{
+    const a=.05+.95*(v/(mx||1));
+    svgEl("rect",{x:ox+k*c+1,y:oy+r*c+1,width:c-2,height:c-2,fill:"var(--red)","fill-opacity":a.toFixed(3),stroke:"var(--ink)","stroke-opacity":.25,"data-tip":"Row "+(r+1)+", column "+(k+1)+": "+(v*100).toFixed(1)+"% of attention"},svg);
+  }));
+  cols.forEach((v,k)=>{ const h=Math.max(1,34*v/mm); svgEl("rect",{x:ox+k*c+6,y:oy-8-h,width:c-12,height:h,fill:"var(--ink)","data-tip":"Column "+(k+1)+": "+(v*100).toFixed(1)+"%"},svg); });
+  rows.forEach((v,r)=>{ const w=Math.max(1,34*v/mm); svgEl("rect",{x:ox+gw+8,y:oy+r*c+6,width:w,height:c-12,fill:"var(--ink)","data-tip":"Row "+(r+1)+": "+(v*100).toFixed(1)+"%"},svg); });
+  svgEl("text",{x:ox,y:oy+gw+18,class:"soft"},svg,"left");
+  svgEl("text",{x:ox+gw,y:oy+gw+18,"text-anchor":"end",class:"soft"},svg,"right");
+  svgEl("text",{x:ox,y:12,class:"soft"},svg,"top of frame ↓");
+  let centre=0; const q=n/4;
+  for(let r=q;r<n-q;r++) for(let k=q;k<n-q;k++) centre+=grid[r][k];
+  $("attnNote").textContent=(centre*100).toFixed(0)+"% of the attention landed in the middle quarter of the frame"+
+    (centre>.5?", so the model stayed on the subject.":", so it was looking toward the edges. Check that it wasn’t reading the background.");
+}
+
+/* D. tally of this visit, grouped in fives */
+const seen={};
+function drawTally(){
+  const box=$("tally"); box.textContent="";
+  const names=Object.keys(seen).sort((a,b)=>seen[b]-seen[a]||a.localeCompare(b));
+  if(!names.length){ const p=document.createElement("p"); p.className="tally-empty"; p.textContent="Nothing filed yet."; box.appendChild(p); return; }
+  names.forEach(name=>{
+    const count=seen[name], row=document.createElement("div"); row.className="tally-row";
+    const a=document.createElement("span"); a.textContent=name;
+    const mid=document.createElement("span");
+    const groups=Math.ceil(count/5), w=groups*46;
+    const svg=svgEl("svg",{viewBox:"0 0 "+w+" 30",width:w,height:30,role:"img","aria-label":count+" photos"},null);
+    for(let g=0;g<groups;g++){
+      const k=Math.min(5,count-g*5), gx=g*46+4;
+      for(let i=0;i<Math.min(4,k);i++) svgEl("line",{x1:gx+i*9,x2:gx+i*9,y1:3,y2:27,stroke:"var(--ink)","stroke-width":3.5,"stroke-linecap":"round"},svg);
+      if(k===5) svgEl("line",{x1:gx-3,x2:gx+36,y1:24,y2:6,stroke:"var(--red)","stroke-width":3.5,"stroke-linecap":"round"},svg);
+    }
+    mid.appendChild(svg);
+    const n=document.createElement("span"); n.textContent=count;
+    row.append(a,mid,n); box.appendChild(row);
+  });
+}
+
+function showCharts(data){
+  drawLineup(data.probabilities); drawMargin(data.probabilities); drawAttention(data.attention);
+  seen[data.predictions[0].breed]=(seen[data.predictions[0].breed]||0)+1; drawTally();
+  $("evidence").classList.add("show");
 }
 
 async function handle(f){
@@ -259,10 +477,11 @@ async function handle(f){
 }
 
 function reset(clearErr=true){
+  $("evidence").classList.remove("show");
   if(clearErr) setErr("");
   stage.classList.remove("has-result"); drop.classList.remove("filled","loading","showcam");
   preview.hidden=true; preview.removeAttribute("src"); $("prompt").style.display="";
-  file.value=""; $("arc").style.strokeDashoffset="276.46";
+  file.value="";
   document.querySelectorAll(".chip").forEach(c=>c.classList.remove("hit"));
 }
 

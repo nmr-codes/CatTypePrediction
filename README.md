@@ -1,4 +1,4 @@
-# 🐱 MushukLens — cat breed web app
+# KittenLens — cat breed web app
 
 One-page website: upload (or drag, or paste) a cat photo and a fine-tuned EfficientNet-B0
 predicts one of 12 breeds, shows the top-3 probabilities and a Grad-CAM "where did the AI look" map.
