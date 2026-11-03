@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: kittenlens
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/status
