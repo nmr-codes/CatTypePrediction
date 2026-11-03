@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MushukLens — What kind of cat is that?</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+<style>
+  :root{
+    --bg:#0a0b14; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
+    --text:#f2f3fa; --mute:#9aa0b8; --a:#8b5cf6; --b:#22d3ee; --c:#f472b6; --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{min-height:100%}
+  body{
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); overflow-x:hidden; line-height:1.5;
+  }
+  /* animated background */
+  .bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+  .blob{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(90px);opacity:.38;animation:float 22s ease-in-out infinite}
+  .b1{background:var(--a);top:-18vmax;left:-12vmax}
+  .b2{background:var(--b);bottom:-22vmax;right:-10vmax;animation-delay:-8s}
+  .b3{background:var(--c);top:35%;left:48%;width:30vmax;height:30vmax;opacity:.22;animation-delay:-14s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6vmax,4vmax) scale(1.1)}66%{transform:translate(-4vmax,7vmax) scale(.95)}}
+  .grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;opacity:.18;mask-image:radial-gradient(circle at 50% 30%,#000 10%,transparent 70%);-webkit-mask-image:radial-gradient(circle at 50% 30%,#000 10%,transparent 70%)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:34px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
+  .logo .ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,var(--a),var(--c));box-shadow:0 6px 24px rgba(139,92,246,.45)}
+  .pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);backdrop-filter:blur(10px)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px currentColor;color:var(--warn)}
+  .dot.ok{background:var(--ok);color:var(--ok)} .dot.bad{background:var(--bad);color:var(--bad)}
+
+  .hero{text-align:center;margin-bottom:30px}
+  h1{font-size:clamp(34px,6vw,60px);line-height:1.05;font-weight:900;letter-spacing:-1.5px}
+  h1 span{background:linear-gradient(90deg,var(--b),var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 6s linear infinite}
+  @keyframes shine{to{background-position:200% center}}
+  .hero p{color:var(--mute);max-width:560px;margin:14px auto 0;font-size:17px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 30px 80px rgba(0,0,0,.45)}
+  .stage{display:grid;grid-template-columns:1fr;gap:22px}
+  .stage.has-result{grid-template-columns:1fr 1fr}
+  @media(max-width:760px){.stage.has-result{grid-template-columns:1fr}}
+
+  .drop{position:relative;border:2px dashed rgba(255,255,255,.22);border-radius:20px;min-height:320px;display:grid;place-items:center;text-align:center;padding:26px;cursor:pointer;transition:.25s;overflow:hidden;background:rgba(255,255,255,.02)}
+  .drop:hover,.drop.over{border-color:var(--b);background:rgba(34,211,238,.07);transform:translateY(-2px)}
+  .drop:focus-visible{outline:3px solid var(--a);outline-offset:3px}
+  .drop .big{font-size:58px;display:block;margin-bottom:8px;animation:bob 3s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-8px) rotate(-4deg)}}
+  .drop b{font-size:19px} .drop small{display:block;color:var(--mute);margin-top:6px}
+  .drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px}
+  .drop.filled{border-style:solid;border-color:var(--line);cursor:default;padding:0}
+  .drop.filled:hover{transform:none;background:none}
+  .scan{position:absolute;left:0;right:0;height:90px;top:-90px;background:linear-gradient(180deg,transparent,rgba(34,211,238,.55),transparent);border-bottom:2px solid var(--b);display:none}
+  .drop.loading .scan{display:block;animation:scan 1.4s ease-in-out infinite}
+  .drop.loading::after{content:"Analysing whiskers…";position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(10,11,20,.8);padding:6px 14px;border-radius:999px;font-size:13px;border:1px solid var(--line)}
+  @keyframes scan{to{top:100%}}
+  .tag{position:absolute;top:12px;left:12px;background:rgba(10,11,20,.75);border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12px;display:none;backdrop-filter:blur(6px)}
+  .drop.showcam .tag{display:block}
+
+  .result{display:none;flex-direction:column;gap:16px}
+  .stage.has-result .result{display:flex}
+  .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mute)}
+  .top{display:flex;align-items:center;gap:18px}
+  .ring{position:relative;width:104px;height:104px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .val{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:22px}
+  .name{font-size:clamp(26px,4vw,36px);font-weight:900;letter-spacing:-.5px;line-height:1.1}
+  .blurb{color:var(--mute);font-size:15px;margin-top:6px}
+  .notice{display:none;padding:10px 14px;border-radius:14px;font-size:14px;border:1px solid}
+  .notice.low{display:block;color:var(--warn);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+  .bars{display:flex;flex-direction:column;gap:11px}
+  .row{display:grid;grid-template-columns:130px 1fr 52px;align-items:center;gap:10px;font-size:14px}
+  .track{height:10px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+  .fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--b),var(--a));transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .row.first .fill{background:linear-gradient(90deg,var(--c),var(--a))}
+  .row span:last-child{text-align:right;color:var(--mute);font-variant-numeric:tabular-nums}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+  button{font:inherit;cursor:pointer;border-radius:14px;padding:11px 18px;border:1px solid var(--line);color:var(--text);background:var(--card);transition:.2s}
+  button:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
+  button.primary{border:none;background:linear-gradient(135deg,var(--a),var(--c));font-weight:700;box-shadow:0 8px 26px rgba(139,92,246,.4)}
+  button.on{border-color:var(--b);color:var(--b)}
+  .err{display:none;margin-top:16px;padding:12px 16px;border-radius:14px;color:var(--bad);border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.08);font-size:14px}
+  .banner{display:none;margin-bottom:18px;padding:16px 18px;border-radius:18px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);color:#fde9a8;font-size:14px}
+  .banner code{background:rgba(0,0,0,.35);padding:2px 7px;border-radius:7px;font-size:13px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:30px}
+  .chip{font-size:13px;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--card)}
+  .chip.hit{color:#fff;border-color:var(--c);background:rgba(244,114,182,.18)}
+  footer{margin-top:28px;text-align:center;color:var(--mute);font-size:13px;max-width:640px;margin-inline:auto}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid"></div></div>
+
+<div class="wrap">
+  <header>
+    <div class="logo"><div class="ico">🐱</div>MushukLens</div>
+    <div class="pill"><span class="dot" id="dot"></span><span id="statusText">Checking model…</span></div>
+  </header>
+
+  <div class="hero">
+    <h1>What <span>kind of cat</span><br>is that?</h1>
+    <p>Drop a photo and a fine-tuned EfficientNet tells you the breed, and shows you where it was looking.</p>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <main class="card">
+    <div class="stage" id="stage">
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a cat photo">
+        <div id="prompt">
+          <span class="big">📸</span>
+          <b>Drop a cat photo here</b>
+          <small>or click to browse · paste with Ctrl+V · JPG / PNG / WebP · max 8 MB</small>
+        </div>
+        <img id="preview" alt="" hidden>
+        <div class="scan"></div>
+        <div class="tag">🔥 AI attention map</div>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+
+      <div class="result" id="result">
+        <div class="eyebrow">Best guess</div>
+        <div class="top">
+          <div class="ring">
+            <svg width="104" height="104" viewBox="0 0 104 104">
+              <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>
+              <circle id="arc" cx="52" cy="52" r="44" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46" style="transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)"/>
+              <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#f472b6"/></linearGradient></defs>
+            </svg>
+            <div class="val" id="pct">0%</div>
+          </div>
+          <div>
+            <div class="name" id="breed">—</div>
+            <div class="blurb" id="blurb"></div>
+          </div>
+        </div>
+        <div class="notice" id="notice"></div>
+        <div class="eyebrow">Top 3</div>
+        <div class="bars" id="bars"></div>
+        <div class="actions">
+          <button class="primary" id="again">Try another photo</button>
+          <button id="camBtn">🔥 Show where the AI looked</button>
+        </div>
+      </div>
+    </div>
+    <div class="err" id="err"></div>
+  </main>
+
+  <div class="chips" id="chips"></div>
+  <footer>
+    The model only knows these 12 breeds, so it will pick one of them even for a dog or a toy.
+    Confidence is the model's own estimate, not a guarantee. Photos are processed in memory and are not saved.
+  </footer>
+</div>
+
+<script>
+const INFO = {
+  "Abyssinian":"Ticked, warm-toned coat; athletic, curious and very active.",
+  "Bengal":"Spotted or marbled coat with a wild look; energetic and playful.",
+  "Birman":"Semi-long silky coat, blue eyes and white “gloves” on the paws.",
+  "Bombay":"Sleek, glossy black coat and copper eyes; a mini panther.",
+  "British Shorthair":"Dense plush coat, round face and a sturdy, calm build.",
+  "Egyptian Mau":"Naturally spotted coat; fast and alert.",
+  "Maine Coon":"Large, long-haired, with tufted ears and a bushy tail.",
+  "Persian":"Very long coat and a flat, round face; calm and quiet.",
+  "Ragdoll":"Big, blue-eyed and famously relaxed when picked up.",
+  "Russian Blue":"Short silvery-blue coat and bright green eyes.",
+  "Siamese":"Pointed coat, blue eyes and a very chatty personality.",
+  "Sphynx":"Looks hairless, wrinkly and warm to the touch; very social."
+};
+const $ = id => document.getElementById(id);
+const drop=$("drop"), file=$("file"), preview=$("preview"), stage=$("stage");
+let originalURL=null, heatURL=null, showingCam=false, busy=false;
+
+function setErr(msg){ const e=$("err"); e.textContent=msg||""; e.style.display=msg?"block":"none"; }
+
+async function loadStatus(){
+  try{
+    const s = await (await fetch("/api/status")).json();
+    const dot=$("dot"), txt=$("statusText"), ban=$("banner");
+    if(s.model_loaded){
+      dot.className="dot ok"; txt.textContent="Model ready · "+s.device.toUpperCase();
+      const chips=$("chips"); chips.textContent="";
+      s.classes.forEach(c=>{const d=document.createElement("div");d.className="chip";d.dataset.c=c;d.textContent=c;chips.appendChild(d);});
+    }else{
+      dot.className="dot bad"; txt.textContent="Model not loaded";
+      ban.style.display="block"; ban.textContent="";
+      const t=document.createElement("div");
+      t.append("The weights file is missing. Train the notebook in Colab, download ");
+      const c=document.createElement("code"); c.textContent="mushuklens_effnet_b0.pt"; t.append(c);
+      t.append(" and put it in the "); const c2=document.createElement("code"); c2.textContent="model/"; t.append(c2);
+      t.append(" folder, then restart the server.");
+      ban.appendChild(t);
+      if(s.error){const p=document.createElement("div");p.style.marginTop="6px";p.style.opacity=".8";p.textContent=s.error;ban.appendChild(p);}
+    }
+  }catch{ $("dot").className="dot bad"; $("statusText").textContent="Server unreachable"; }
+}
+
+function countUp(el, to){
+  const t0=performance.now(), dur=1000;
+  (function f(t){ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
+    el.textContent=(to*e).toFixed(0)+"%"; if(k<1) requestAnimationFrame(f); })(t0);
+}
+
+function showResult(data){
+  const [first,...rest]=data.predictions, p=first.probability*100;
+  $("breed").textContent=first.breed;
+  $("blurb").textContent=INFO[first.breed]||"";
+  countUp($("pct"), p);
+  requestAnimationFrame(()=>{ $("arc").style.strokeDashoffset=(276.46*(1-first.probability)).toFixed(2); });
+  const n=$("notice");
+  if(p<50){ n.className="notice low"; n.textContent="I’m not very sure about this one. Try a clearer, closer photo of the cat’s face and body, or the animal might not be one of these 12 breeds."; }
+  else { n.className="notice"; n.textContent=""; }
+  const bars=$("bars"); bars.textContent="";
+  data.predictions.forEach((x,i)=>{
+    const row=document.createElement("div"); row.className="row"+(i===0?" first":"");
+    const a=document.createElement("span"); a.textContent=x.breed;
+    const tr=document.createElement("div"); tr.className="track";
+    const f=document.createElement("div"); f.className="fill"; tr.appendChild(f);
+    const b=document.createElement("span"); b.textContent=(x.probability*100).toFixed(1)+"%";
+    row.append(a,tr,b); bars.appendChild(row);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ f.style.width=(x.probability*100)+"%"; }));
+  });
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("hit", c.dataset.c===first.breed));
+  heatURL=data.heatmap; showingCam=false; updateCam();
+  stage.classList.add("has-result");
+}
+
+function updateCam(){
+  preview.src = showingCam && heatURL ? heatURL : originalURL;
+  drop.classList.toggle("showcam", showingCam);
+  $("camBtn").classList.toggle("on", showingCam);
+  $("camBtn").textContent = showingCam ? "🖼️ Show my photo" : "🔥 Show where the AI looked";
+}
+
+async function handle(f){
+  setErr("");
+  if(!f || busy) return;
+  if(!f.type.startsWith("image/")){ setErr("Please choose an image file."); return; }
+  if(f.size>8*1024*1024){ setErr("That image is bigger than 8 MB."); return; }
+  if(originalURL) URL.revokeObjectURL(originalURL);
+  originalURL=URL.createObjectURL(f);
+  preview.src=originalURL; preview.hidden=false; $("prompt").style.display="none";
+  drop.classList.add("filled","loading"); stage.classList.remove("has-result"); busy=true;
+  const fd=new FormData(); fd.append("image", f);
+  try{
+    const r=await fetch("/api/predict",{method:"POST",body:fd});
+    const data=await r.json().catch(()=>({error:"Unexpected server response."}));
+    if(!r.ok) throw new Error(data.error||"Prediction failed.");
+    showResult(data);
+  }catch(e){ setErr(e.message); reset(false); }
+  finally{ drop.classList.remove("loading"); busy=false; }
+}
+
+function reset(clearErr=true){
+  if(clearErr) setErr("");
+  stage.classList.remove("has-result"); drop.classList.remove("filled","loading","showcam");
+  preview.hidden=true; preview.removeAttribute("src"); $("prompt").style.display="";
+  file.value=""; $("arc").style.strokeDashoffset="276.46";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("hit"));
+}
+
+drop.addEventListener("click",()=>{ if(!drop.classList.contains("filled")) file.click(); });
+drop.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ")&&!drop.classList.contains("filled")){e.preventDefault();file.click();} });
+file.addEventListener("change",()=>handle(file.files[0]));
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>handle(e.dataTransfer.files[0]));
+window.addEventListener("dragover",e=>e.preventDefault());
+window.addEventListener("drop",e=>{ if(!drop.contains(e.target)){ e.preventDefault(); handle(e.dataTransfer.files[0]); } });
+window.addEventListener("paste",e=>{ const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith("image/")); if(it) handle(it.getAsFile()); });
+$("again").addEventListener("click",()=>{ reset(); });
+$("camBtn").addEventListener("click",()=>{ showingCam=!showingCam; updateCam(); });
+loadStatus();
+</script>
+</body>
+</html>
